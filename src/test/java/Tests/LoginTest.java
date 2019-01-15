@@ -1,37 +1,19 @@
-/*
- * Copyright 2014-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 package Tests;
 
 import cucumber.api.CucumberOptions;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.After;
 
-
+import Pages.IntroPage;
 import Pages.LoginPage;
 import Tests.AbstractBaseTests.TestBase;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-/**
- * Tests for a login page
- */
-
 
 @CucumberOptions(
         strict = true,
@@ -40,53 +22,84 @@ import org.testng.annotations.Test;
         plugin = {"pretty"}
 )
 public class LoginTest extends TestBase {
-    private static final String LOGIN_SUCCESS_MESSAGE = "You are logged on as admin";
-    private static final String LOGIN_FAIL_MESSAGE = "You gave me the wrong username and password";
-    private static final String CORRECT_USER_NAME = "admin";
-    private static final String CORRECT_PASSWORD = "password";
-    private static final String FAIL_USER_NAME = "Wrong User";
-    private static final String FAIL_PASSWORD = "12345";
-    private static final String BAD_TEXT_ENTRY_MSG = "Username sent to text field incorrectly";
+    private static final String CLIENT_VALID_EMAIL = "28@test.com";
+    private static final String CLIENT_VALID_PASSWORD = "password1";
+    private static final String CLIENT_INVALID_EMAIL = "Invalid Email";
+    private static final String CLIENT_INVALID_PASSWORD = "passwor";
+    private static final String PRO_VALID_EMAIL = "august@test.com";
+    private static final String PRO_VALID_PASSWORD = "password1";
+    private static final String LOGIN_EMPTY_EMAIL_ERROR_MESSAGE = "Please enter your email address";
+    private static final String LOGIN_EMPTY_PASSWORD_ERROR_MESSAGE = "Please enter your password";
+    private static final String LOGIN_INVALID_EMAIL_ERROR_MESSAGE = "Please enter a valid email address";
 
+    private IntroPage introPage;
     private LoginPage loginPage;
 
-    @Override
-    public String getName() {
-        return "Login Page";
-    }
-
-    /**
-     * Creates a login
-     */
     @Given("^I navigate to the login page$")
     public void setUpPage() {
+        introPage = new IntroPage(driver);
         loginPage = new LoginPage(driver);
     }
 
-    /**
-     * Tests logging in with valid credentials by verifying if the login message is correct
-     */
-    @Given("^username is correct$")
-    public void loginSuccess() throws InterruptedException {
-        Assert.assertTrue(loginPage.login(CORRECT_USER_NAME, CORRECT_PASSWORD));
-        Assert.assertEquals(loginPage.getMessage(), LOGIN_SUCCESS_MESSAGE);
+    @Given("^the ([^\"]*) user enters a ([^\"]*) username and password$")
+	public void loginAttempt(String usertype, String validity) throws InterruptedException {
+        if (usertype.equals("client") && validity.equals("valid")) {
+            Assert.assertTrue(loginPage.enterUsernameAndPassword(CLIENT_VALID_EMAIL, CLIENT_VALID_PASSWORD));
+		} else if (usertype.equals("pro") && validity.equals("valid")) {
+            Assert.assertTrue(loginPage.enterUsernameAndPassword(PRO_VALID_EMAIL, PRO_VALID_PASSWORD));
+		} else if (usertype.equals("client") && validity.equals("invalid")) {
+            Assert.assertTrue(loginPage.enterUsernameAndPassword(CLIENT_VALID_EMAIL, CLIENT_INVALID_PASSWORD));
+		}
     }
 
-    /**
-     * Tests logging in with invalid credentials by verifying if the error message is correct
-     */
-    @Given("^username is bad$")
-    public void loginFail() throws InterruptedException {
-        Assert.assertTrue(loginPage.login(FAIL_USER_NAME, FAIL_PASSWORD));
-        Assert.assertEquals(loginPage.getMessage(), LOGIN_FAIL_MESSAGE);
+    @Given("^the user enters an invalid ([^\"]*)$")
+	public void enterInvalidDetails(String field) throws InterruptedException {
+        if (field.equals("email")) {
+            Assert.assertTrue(loginPage.enterUsernameAndPassword(CLIENT_INVALID_EMAIL, CLIENT_VALID_PASSWORD));
+        } else if (field.equals("password")) {
+            Assert.assertTrue(loginPage.enterUsernameAndPassword(CLIENT_VALID_EMAIL, CLIENT_INVALID_PASSWORD));
+        }
     }
 
-    /**
-     * After each test method, logout or try again
-     */
-    @Then("^log out$")
-    public void logOut() {
-        loginPage.pressAltButton();
+    @And("^the user clicks on the login button$")
+    public void clickLogin() throws InterruptedException {
+        loginPage.clickLoginButton();
+    }
+
+    @And("^the user clicks on the try again button$")
+	public void clickTryAgainButton() throws InterruptedException {
+		loginPage.clickLoginTryAgain();
+	}
+
+    @Then("^the login screen is displayed$")
+	public void checkIfOnLoginPage() throws InterruptedException {
         Assert.assertTrue(loginPage.checkIfBackAtLogin());
+    }
+
+    @Then("^the ([^\"]*) user is successfully logged in$")
+	public void successfulLogin(String usertype) throws InterruptedException {
+        introPage.cycleThroughScreens();
+        Assert.assertTrue(introPage.isOnIntro());
+    }
+
+    @Then("^the error messages are displayed$")
+	public void checkErrorMessages() throws InterruptedException {
+        Assert.assertEquals(loginPage.getEmailErrorMessage(), LOGIN_EMPTY_EMAIL_ERROR_MESSAGE);
+        Assert.assertEquals(loginPage.getPasswordErrorMessage(), LOGIN_EMPTY_PASSWORD_ERROR_MESSAGE);
+    }
+
+    @Then("^the invalid email error message is displayed$")
+	public void checkEmailErrorMessages() throws InterruptedException {
+        Assert.assertEquals(loginPage.getEmailErrorMessage(), LOGIN_INVALID_EMAIL_ERROR_MESSAGE);
+    }
+
+    @Then("^the invalid password error meesage is displayed$")
+	public void checkPasswordErrorMessages() throws InterruptedException {
+        Assert.assertTrue(loginPage.checkInvalidLoginAlertExists());
+    }
+    
+    @After
+    public void restartApp() {
+        driver.resetApp();
     }
 }
