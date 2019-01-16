@@ -43,10 +43,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemProperties>
-                    <property>
-                        <name>env</name>
-                        <value>${env}</value>
-                    </property>
+                        <property>
+                            <name>env</name>
+                            <value>${env}</value>
+                        </property>
                     </systemProperties>
                 </configuration>
             </plugin>

@@ -5,11 +5,13 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.Before;
 import cucumber.api.java.After;
 
 import Pages.IntroPage;
 import Pages.LoginPage;
 import Tests.AbstractBaseTests.TestBase;
+import java.net.MalformedURLException;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeTest;
@@ -19,7 +21,8 @@ import org.testng.annotations.Test;
         strict = true,
         monochrome = true,
         features = "classpath:LoginTest",
-        plugin = {"pretty"}
+        plugin = {"pretty"},
+        tags = {"@TC_Login_006"}
 )
 public class LoginTest extends TestBase {
     private static final String CLIENT_VALID_EMAIL = "28@test.com";
@@ -34,6 +37,11 @@ public class LoginTest extends TestBase {
 
     private IntroPage introPage;
     private LoginPage loginPage;
+
+    @Before
+    public void setupBrowserStackDriver() throws MalformedURLException {
+        this.beforeScenario();
+    }
 
     @Given("^I navigate to the login page$")
     public void setUpPage() {
@@ -100,6 +108,6 @@ public class LoginTest extends TestBase {
     
     @After
     public void restartApp() {
-        driver.resetApp();
+        this.afterScenario();
     }
 }

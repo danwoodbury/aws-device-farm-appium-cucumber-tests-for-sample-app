@@ -1,0 +1,26 @@
+{
+  "name": "app-qa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danwoodbury/aws-device-farm-appium-cucumber-tests-for-sample-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danwoodbury/aws-device-farm-appium-cucumber-tests-for-sample-app/issues"
+  },
+  "homepage": "https://github.com/danwoodbury/aws-device-farm-appium-cucumber-tests-for-sample-app#readme",
+  "dependencies": {
+    "aws-sdk": "^2.388.0"
+  },
+  "devDependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/node": "^10.12.18"
+  }
+}

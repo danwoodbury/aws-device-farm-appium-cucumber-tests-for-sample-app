@@ -28,7 +28,7 @@ Feature: Testing the Login screen Functionalities
         When the user clicks on the login button
         Then the invalid email error message is displayed
 
-    @TC_Login_005  @Regression
+    @TC_Login_005 @Regression
     Scenario: To verify error pop-up is displayed when user enters valid Email and Invalid Password
         Given the user enters an invalid password
         When the user clicks on the login button
